@@ -16,7 +16,6 @@ def get_repo_info(repo_owner: str, repo_name: str):
 @task(persist_result=True)
 def get_contributors(repo_info: dict):
     """Get contributors for a repo"""
-    raise ValueError("error")
     contributors_url = repo_info["contributors_url"]
     response = httpx.get(contributors_url)
     response.raise_for_status()
