@@ -1,5 +1,6 @@
 import httpx
 from prefect import flow, task
+from prefect_gcp import GcsBucket, GcpCredentials
 
 
 @task(persist_result=True, retries=2)
@@ -23,7 +24,18 @@ def get_contributors(repo_info: dict):
     return contributors
 
 
-@flow(persist_result=True, log_prints=True)
+gcp_credentials = GcpCredentials.load("prefect-gcp-credential")
+
+
+@flow(
+    persist_result=True,
+    result_storage=GcsBucket(
+        bucket="gj-config-bucket",
+        bucket_folder="prefect",
+        gcp_credentials=gcp_credentials,
+    ),
+    log_prints=True,
+)
 def repo_info(repo_owner: str = "PrefectHQ", repo_name: str = "prefect"):
     """
     Given a GitHub repository, logs the number of stargazers
